@@ -1,0 +1,107 @@
+.nonHighlightable {
+  -webkit-user-select: none; /* Safari */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE10+/Edge */
+  user-select: none; /* Standard */
+}
+
+.text-color-white {
+  color: white !important;
+}
+
+.UserSearch {
+  .searchResults {
+    position: absolute;
+    top: 60px;
+    right: 10px;
+    z-index: 2;
+  }
+  .userSearch-result {
+    padding: 5px;
+    button {
+      margin-left: 5px;
+    }
+    cursor: pointer;
+    &:hover {
+      background-color: #ececec;
+    }
+  }
+}
+
+.SocialContacts {
+  @extend .nonHighlightable;
+  border-left: 1px solid lightgray;
+  z-index: 4;
+  padding-top: 100px;
+  background-color: #fdfdfd;
+  width: 240px;
+  h4 {
+    //title
+    cursor: pointer;
+    margin-left: 15px;
+  }
+  .uk-heading-line {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .User {
+    padding: 5px 10px;
+    cursor: pointer;
+    &:hover {
+      background-color: #ececec;
+    }
+    .Avatar {
+      margin-right: 5px;
+    }
+    .avatarAndName {
+      max-width: 92%;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+    .isOnline {
+      height: 8px;
+      width: 8px;
+      border-radius: 50%;
+      background-color: gray;
+    }
+    .online {
+      background-color: #67f391;
+    }
+  }
+}
+
+.Profile {
+  .ProfileContent {
+    max-width: 1400px;
+  }
+  .AboutMe {
+    background-color: white;
+  }
+  .profile-name {
+    position: absolute;
+    bottom: 55px;
+    left: 280px;
+  }
+  .ProfilePic {
+    img {
+      cursor: pointer;
+      border-radius: 5px;
+      border: 3px solid white;
+      height: 230px;
+      width: 230px;
+    }
+  }
+  .nav-btns {
+    margin-left: 280px;
+  }
+  .profile-nav-btn {
+    display: flex;
+    cursor: pointer;
+    margin-right: 12px;
+    a {
+      margin-right: 4px;
+    }
+  }
+}
