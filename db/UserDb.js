@@ -1,18 +1,19 @@
 import firebase from "firebase";
 
-class UserService {
+class UserDb {
   createUser(user, callback) {
     if (!user || !user.email || !user.password) {
       throw new Error(
-        `UserService.create(): requires a user object with an email && password`
+        `UserDb.create(): requires a user object with an email && password`
       );
     }
     firebase
       .auth()
       .createUserWithEmailAndPassword(user.email, user.password)
       .then(res => {
+        delete user.password;
         const userDataByPrivacy = {
-          publicInfo: _getPublicUserObject(user.email),
+          publicInfo: Object.assign(_getPublicUserObject(user.email), user),
           privateInfo: _getPrivateUserObject(),
           serverInfo: _getServerUserObject()
         };
@@ -126,8 +127,8 @@ class UserService {
   }
 }
 
-const userService = new UserService();
-export default userService;
+const userDb = new UserDb();
+export default userDb;
 
 const _applyLstenersForCurrentUser = function(uid, callback) {
   if (!uid) {
@@ -179,6 +180,7 @@ const _getPrivateUserObject = function() {
 const _getServerUserObject = function() {
   return {
     //user-only-readable, server-only writeable
+    //new fields should be validated in database.rules.json
     walletBalance: 0,
     isAdmin: false
   };

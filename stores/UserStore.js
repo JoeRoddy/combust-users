@@ -1,6 +1,5 @@
 import { observable, computed } from "mobx";
-
-import userService from "../service/UserService";
+import userDb from "../db/UserDb";
 
 class UserStore {
   @observable userId = null;
@@ -65,14 +64,14 @@ class UserStore {
    * @param {function} callback
    */
   login(user, callback) {
-    userService.login(user, callback);
+    userDb.login(user, callback);
   }
 
   /**
    * logs out the current user
    */
   logout() {
-    userService.logout(this.user);
+    userDb.logout(this.user);
   }
 
   /**
@@ -91,7 +90,7 @@ class UserStore {
       });
     }
 
-    userService.createUser(user, (err, userDataByPrivacy) => {
+    userDb.createUser(user, (err, userDataByPrivacy) => {
       if (err) return callback(err);
       _saveCurrentUserLocally(userDataByPrivacy);
       callback(err, userDataByPrivacy);
@@ -127,7 +126,7 @@ let _onLoginTriggers = [];
 let _onLogoutTriggers = [];
 
 const _listenToCurrentUser = function() {
-  userService.listenToCurrentUser((err, userData) => {
+  userDb.listenToCurrentUser((err, userData) => {
     if (err) {
       debugger;
       return;
@@ -153,7 +152,9 @@ const _updateUser = function() {
   const uid = user.id;
   delete user.save;
   delete user.id;
-  userService.saveToUsersCollection(uid, { publicInfo: user });
+  delete user.displayName;
+  userDb.saveToUsersCollection(uid, { publicInfo: user });
+  _savePublicUserInfo(uid, user); //reapply deleted properties
 };
 
 const _handleUserLogout = function() {
@@ -183,7 +184,6 @@ const _handleUserEstablished = function() {
 const _saveCurrentUserLocally = function(userDataByPrivacy) {
   const { id, publicInfo, privateInfo, serverInfo } = userDataByPrivacy;
   if (publicInfo) {
-    publicInfo.save = _updateUser;
     _savePublicUserInfo(id, publicInfo);
   }
   if (privateInfo) {
@@ -196,7 +196,7 @@ const _saveCurrentUserLocally = function(userDataByPrivacy) {
 };
 
 const _listenToPublicUserData = function(userId) {
-  userService.listenToUser(userId, (err, user) => {
+  userDb.listenToUser(userId, (err, user) => {
     _savePublicUserInfo(userId, user);
   });
 };
@@ -206,6 +206,7 @@ const _savePublicUserInfo = function(userId, user) {
     return;
   }
   user.displayName = user.email;
+  user.save = _updateUser;
   user.id = userId;
   userStore.usersMap.set(userId, user);
 };
