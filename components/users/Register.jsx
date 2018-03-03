@@ -3,28 +3,28 @@ import { observer } from "mobx-react";
 import { Link } from "react-router-dom";
 
 import userStore from "../../stores/UserStore";
+import Form from "../reusable/Form";
+
+const fields = {
+  //legal data types: string, text, number, boolean, image
+  email: "string",
+  password: "string"
+};
 
 @observer
 export default class Register extends Component {
   state = {
-    email: "",
-    password: "",
     errMessage: ""
   };
 
-  componentWillUpdate(nextProps) {
+  componentDidUpdate(nextProps) {
     if (userStore.user) {
       this.props.history.push("/");
     }
   }
 
-  submit = e => {
-    e.preventDefault();
-    let user = {
-      email: this.state.email,
-      password: this.state.password
-    };
-    userStore.createUser(user, (err, userData) => {
+  handleSubmit = formData => {
+    userStore.createUser(formData, (err, userData) => {
       if (err) {
         this.setState({ errMessage: err.message });
       } else {
@@ -34,42 +34,23 @@ export default class Register extends Component {
   };
 
   render() {
+    const user = userStore.user;
+
     return (
       <div className="Register uk-flex uk-flex-center uk-margin">
-        <form onSubmit={this.submit} className="uk-width-medium">
-          <legend className="uk-legend">New Account</legend>
-          <div className="uk-margin">
-            <input
-              className="uk-input uk-form-width-medium"
-              type="text"
-              onChange={e => {
-                this.setState({ email: e.target.value });
-              }}
-              placeholder="Email"
-            />
-          </div>
-          <div className="uk-margin">
-            <input
-              className="uk-input uk-form-width-medium"
-              type="password"
-              onChange={e => {
-                this.setState({ password: e.target.value });
-              }}
-              placeholder="Password"
-            />
-          </div>
-          <button
-            className="uk-button uk-button-default uk-form-width-medium uk-margin-small-bottom"
-            onClick={this.submit}
-          >
-            Sign Up
-          </button>{" "}
+        {user && <div>You already have an account.</div>}
+        <Form
+          onSubmit={this.handleSubmit}
+          submitText="Sign Up"
+          fields={fields}
+          title="New Account"
+        >
           <br />
           <Link to="/login">Login instead</Link>
           <div className="uk-text-danger uk-text-break uk-margin-small-top">
             {this.state.errMessage}
           </div>
-        </form>
+        </Form>
       </div>
     );
   }

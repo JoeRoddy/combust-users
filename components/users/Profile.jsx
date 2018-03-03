@@ -1,10 +1,12 @@
 import userStore from "../../stores/UserStore";
 import React, { Component } from "react";
 import { observer } from "mobx-react";
+import { Link } from "react-router-dom";
 
 import Icon from "../reusable/Icon";
-import { uploadDocument } from "../../service/FileService";
-import "./styles/Users.css";
+import { firebaseConfig } from "../../.combust/config";
+import { uploadDocument } from "../../db/FileDb";
+import "./styles/Users.scss";
 
 @observer
 export default class Profile extends Component {
@@ -23,6 +25,17 @@ export default class Profile extends Component {
   }
 
   uploadProfilePicture = (e, user) => {
+    if (!firebaseConfig.storageBucket) {
+      return prompt(
+        `Ensure you've enabled storage first, then re-execute:\n combust conbigure ${
+          firebaseConfig.projectId
+        }`,
+        `https://console.firebase.google.com/project/${
+          firebaseConfig.projectId
+        }/storage/files`
+      );
+    }
+
     const profilePic = this.refs.profilePic.files[0];
     uploadDocument(profilePic, "images/", (err, res) => {
       if (err) return console.error(err);
@@ -35,8 +48,13 @@ export default class Profile extends Component {
     const userId = this.props.match.params.userId;
     const user = userStore.getUserById(userId);
     const isMyProfile = userId === userStore.userId;
+
+    if (!user) {
+      return <span />;
+    }
+
     return (
-      <div className="Profile" uk-height-viewport="true">
+      <div className="Profile">
         <div>
           <div>
             <div
@@ -46,8 +64,8 @@ export default class Profile extends Component {
                   'url("https://static.pexels.com/photos/459225/pexels-photo-459225.jpeg")'
               }}
             >
-              <div className="uk-text-large profile-name text-color-white">
-                {user && user.email}
+              <div className="uk-text-large profile-name uk-text-white">
+                {user.displayName}
               </div>
             </div>
             <div className="uk-panel uk-flex uk-flex-center uk-flex-middle">
@@ -67,7 +85,6 @@ export default class Profile extends Component {
                     </li>
                     <li className="profile-nav-btn">
                       <Icon type="user" />
-
                       <span
                         onClick={e => {
                           this.sendFriendRequest(userId);
@@ -91,46 +108,57 @@ export default class Profile extends Component {
                   </ul>
                 ) : (
                   <ul className="uk-iconnav nav-btns">
-                    <li
-                      className="profile-nav-btn"
-                      onClick={e => alert("combust install profile-details")}
-                    >
-                      <Icon type="pencil" />
-                      <span className="uk-link">Edit Profile</span>
-                    </li>
-                  </ul>
-                )}
-              </div>
-              <div className="ProfilePic uk-position-bottom-left uk-margin-small-left uk-margin-small-bottom">
-                {user &&
-                  user.iconUrl && (
-                    <div
-                      className="uk-inline-clip uk-transition-toggle"
-                      tabindex="0"
-                    >
+                    <li className="profile-nav-btn">
                       <label>
-                        <img src={user.iconUrl} alt="" />
-                        {isMyProfile && (
-                          <div className="uk-position-center uk-light profile-uploadIcon">
-                            <span
-                              className="uk-transition-fade"
-                              uk-icon="icon: plus; ratio: 2"
-                            />
-                          </div>
-                        )}
                         <input
                           onChange={e => this.uploadProfilePicture(e, user)}
                           type="file"
                           ref="profilePic"
                           style={{ display: "none" }}
                         />
+
+                        <Icon type="image" />
+                        <span className="uk-link">Change Avatar</span>
                       </label>
-                    </div>
-                  )}
+                    </li>
+                    <li className="profile-nav-btn">
+                      <Icon type="file-edit" />
+                      <Link to="/updateUser">
+                        <span className="uk-link">Update Info</span>
+                      </Link>
+                    </li>
+                  </ul>
+                )}
+              </div>
+              <div className="ProfilePic uk-position-bottom-left uk-margin-small-left uk-margin-small-bottom">
+                {user.iconUrl && (
+                  <div className="uk-inline-clip uk-transition-toggle">
+                    <label>
+                      <img src={user.iconUrl} alt="" />
+                      {isMyProfile && (
+                        <div className="uk-position-center uk-light profile-uploadIcon">
+                          <span
+                            className="uk-transition-fade"
+                            uk-icon="icon: plus; ratio: 2"
+                          />
+                        </div>
+                      )}
+                      <input
+                        onChange={e => this.uploadProfilePicture(e, user)}
+                        type="file"
+                        ref="profilePic"
+                        style={{ display: "none" }}
+                      />
+                    </label>
+                  </div>
+                )}
               </div>
             </div>
           </div>
-          <div className="uk-background-muted uk-flex uk-flex-center">
+          <div
+            className="uk-background-muted uk-flex uk-flex-center"
+            uk-height-viewport="expand: true"
+          >
             <div
               className="ProfileContent uk-grid-collapse uk-width-auto uk-child-width-1-2@s uk-flex-left"
               uk-grid="true"
@@ -138,12 +166,8 @@ export default class Profile extends Component {
               <div className="uk-padding-large uk-background-muted">
                 <ExamplePosts user={user} />
               </div>
-              <div className="AboutMe uk-padding-large">
+              <div className="uk-padding-large uk-background-default">
                 <h1>About me</h1>
-                <p>
-                  Run <code>combust install profile-details</code> to make this
-                  editable :D
-                </p>
                 {[1, 2, 3, 4].map(i => {
                   return (
                     <p key={i}>

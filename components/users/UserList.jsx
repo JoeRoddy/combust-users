@@ -21,7 +21,7 @@ const UserList = observer(({ users, onUserClicked, title }) => {
             >
               <span className="avatarAndName">
                 <Avatar src={user.iconUrl} height={30} />
-                <span className="userName">{user.email}</span>
+                <span className="userName">{user.displayName}</span>
               </span>
               <span
                 className={"isOnline " + (user.isOnline ? "online" : "offline")}

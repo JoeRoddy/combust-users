@@ -10,16 +10,24 @@
 }
 
 .UserSearch {
-  .searchResults {
-    position: absolute;
-    top: 60px;
-    right: 10px;
+  form {
     z-index: 2;
+  }
+  .searchResults {
+    z-index: 2;
+    position: absolute;
+    top: 50px;
+    right: 30px;
+    width: 170px;
+    padding: 0px;
+    padding-left: 0px;
+    padding-right: 0px;
   }
   .userSearch-result {
     padding: 5px;
-    button {
-      margin-left: 5px;
+    padding-left: 15px;
+    img {
+      margin-right: 8px;
     }
     cursor: pointer;
     &:hover {
@@ -75,9 +83,6 @@
 .Profile {
   .ProfileContent {
     max-width: 1400px;
-  }
-  .AboutMe {
-    background-color: white;
   }
   .profile-name {
     position: absolute;
